@@ -85,7 +85,7 @@ class Ledger:
     def metrics(self, owner):
         with connect(self.path) as db:
             rows = db.execute('SELECT state,charged,reserved,latency_ms,cached FROM requests WHERE owner=?',(owner,)).fetchall()
-        done = [r for r in rows if r['state']=='complete']
+        done = [r for r in rows if r['state'] in ('complete','purged')]
         latencies = sorted(r['latency_ms'] for r in done)
         return {'requests':len(rows),'completed':len(done),'cache_hits':sum(r['cached'] for r in done),
                 'charged_usd':sum(r['charged'] for r in done)/NANO,
