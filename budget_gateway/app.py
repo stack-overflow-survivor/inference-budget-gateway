@@ -58,10 +58,8 @@ def create_app(path=None,provider=None):
         cache_key=fingerprint+':'+model+':'+os.getenv('MODEL_BASE_URL','demo')+':'+os.getenv(model.upper()+'_MODEL',model)
         cache_hit=ledger.cached(user,cache_key) if body.cache and body.temperature==0 else None
         reserved=0 if cache_hit else estimate_input(body.messages)*in_rate+body.max_tokens*out_rate
-        if reserved/NANO>body.max_cost_usd:
-            raise HTTPException(402,'Estimated request reservation exceeds max_cost_usd')
         ident,replay=ledger.reserve(user,idempotency_key or str(uuid.uuid4()),fingerprint,model,reserved,
-                                   int(float(os.getenv('DAILY_BUDGET_USD','1'))*NANO))
+                                   int(float(os.getenv('DAILY_BUDGET_USD','1'))*NANO), int(body.max_cost_usd*NANO))
         if replay:
             return replay
         if cache_hit:

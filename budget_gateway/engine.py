@@ -44,7 +44,7 @@ class Ledger:
     def fingerprint(self, body):
         return hashlib.sha256(json.dumps(body.model_dump(),sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
-    def reserve(self, owner, idem, fingerprint, model, amount, limit):
+    def reserve(self, owner, idem, fingerprint, model, amount, limit, request_limit=None):
         day = time.strftime('%Y-%m-%d',time.gmtime())
         with connect(self.path) as db:
             db.execute('BEGIN IMMEDIATE')
@@ -55,6 +55,8 @@ class Ledger:
                 if old['state']=='complete':
                     return old['id'], json.loads(old['response'])
                 raise HTTPException(409,'Request already '+old['state']+'; do not automatically retry uncertain provider work')
+            if request_limit is not None and amount > request_limit:
+                raise HTTPException(402, 'Estimated request reservation exceeds max_cost_usd')
             # Include unresolved reservations from earlier days, to avoid a midnight bypass.
             spent = db.execute("SELECT COALESCE(SUM(CASE WHEN state IN ('reserved','uncertain') THEN reserved WHEN day=? THEN charged ELSE 0 END),0) FROM requests WHERE owner=?",(day,owner)).fetchone()[0]
             if spent + amount > limit:

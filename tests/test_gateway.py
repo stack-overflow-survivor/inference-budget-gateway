@@ -133,3 +133,44 @@ def test_metrics_are_tenant_scoped(setup):
     c,_=setup
     c.post('/v1/chat/completions',json=payload())
     assert c.get('/metrics',headers={'Authorization':'Bearer bob'}).json()['requests']==0
+
+def test_inflight_duplicate_does_not_reserve_twice(tmp_path):
+    ledger=Ledger(str(tmp_path/'inflight.db'))
+    ledger.reserve('tenant','same','fingerprint','small',60,100)
+    with pytest.raises(Exception) as caught:
+        ledger.reserve('tenant','same','fingerprint','small',60,100)
+    assert caught.value.status_code==409
+    assert ledger.metrics('tenant')['requests']==1
+
+def test_provider_usage_above_estimate_is_visible(tmp_path,monkeypatch):
+    monkeypatch.setenv('API_KEYS','alice')
+    class Overshoot:
+        async def generate(self,*args):
+            return 'Answer',{'prompt_tokens':100000,'completion_tokens':5},'mock'
+    with TestClient(create_app(str(tmp_path/'over.db'),Overshoot())) as c:
+        response=c.post('/v1/chat/completions',json=payload(),headers={'Authorization':'Bearer alice'}).json()
+        assert response['gateway']['reservation_exceeded']
+        assert response['gateway']['cost_usd']>.001
+
+def test_live_provider_contract(monkeypatch):
+    import asyncio
+    from budget_gateway import provider
+    from budget_gateway.app import Completion
+    monkeypatch.setenv('MODEL_BASE_URL','http://model.invalid/v1')
+    monkeypatch.setenv('SMALL_MODEL','test-model')
+    sent=[]
+    class Response:
+        def raise_for_status(self): pass
+        def json(self): return {'choices':[{'message':{'content':'Actual-shaped response'}}],'usage':{'prompt_tokens':3,'completion_tokens':2}}
+    class FakeClient:
+        def __init__(self,**kwargs): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self,*args): pass
+        async def post(self,url,**kwargs):
+            sent.append((url,kwargs['json']))
+            return Response()
+    monkeypatch.setattr(provider.httpx,'AsyncClient',FakeClient)
+    text,usage,mode=asyncio.run(provider.Provider().generate('small',Completion(**payload())))
+    assert mode=='live' and usage['completion_tokens']==2
+    assert sent[0][0]=='http://model.invalid/v1/chat/completions'
+    assert sent[0][1]['model']=='test-model'

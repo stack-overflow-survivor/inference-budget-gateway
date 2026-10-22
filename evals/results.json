@@ -1,0 +1,126 @@
+{
+  "mode": "deterministic-demo",
+  "scope": "Synthetic heuristic-routing and exact-cache workload; no model quality or GPU speed claims",
+  "python": "3.12.4",
+  "routing_fixture_matches": 12,
+  "total_requests": 12,
+  "metrics": {
+    "requests": 12,
+    "completed": 12,
+    "cache_hits": 6,
+    "charged_usd": 0.0001332,
+    "held_reservations_usd": 0.0,
+    "p50_ms": 1.259,
+    "p95_ms": 1.786
+  },
+  "requests": [
+    {
+      "prompt": "Say hello",
+      "expected_tier": "small",
+      "actual_tier": "small",
+      "repeat": false,
+      "cache_hit": false,
+      "cost_usd": 3.4e-06,
+      "latency_ms": 1.534
+    },
+    {
+      "prompt": "Summarize this note",
+      "expected_tier": "small",
+      "actual_tier": "small",
+      "repeat": false,
+      "cache_hit": false,
+      "cost_usd": 3.9e-06,
+      "latency_ms": 1.259
+    },
+    {
+      "prompt": "List three colors",
+      "expected_tier": "small",
+      "actual_tier": "small",
+      "repeat": false,
+      "cache_hit": false,
+      "cost_usd": 3.9e-06,
+      "latency_ms": 1.298
+    },
+    {
+      "prompt": "Debug this architecture",
+      "expected_tier": "large",
+      "actual_tier": "large",
+      "repeat": false,
+      "cache_hit": false,
+      "cost_usd": 3.9e-05,
+      "latency_ms": 1.624
+    },
+    {
+      "prompt": "Compare retrieval tradeoffs",
+      "expected_tier": "large",
+      "actual_tier": "large",
+      "repeat": false,
+      "cache_hit": false,
+      "cost_usd": 3.9e-05,
+      "latency_ms": 1.002
+    },
+    {
+      "prompt": "Prove the following theorem",
+      "expected_tier": "large",
+      "actual_tier": "large",
+      "repeat": false,
+      "cache_hit": false,
+      "cost_usd": 4.4e-05,
+      "latency_ms": 1.119
+    },
+    {
+      "prompt": "Say hello",
+      "expected_tier": "small",
+      "actual_tier": "small",
+      "repeat": true,
+      "cache_hit": true,
+      "cost_usd": 0.0,
+      "latency_ms": 1.079
+    },
+    {
+      "prompt": "Summarize this note",
+      "expected_tier": "small",
+      "actual_tier": "small",
+      "repeat": true,
+      "cache_hit": true,
+      "cost_usd": 0.0,
+      "latency_ms": 1.786
+    },
+    {
+      "prompt": "List three colors",
+      "expected_tier": "small",
+      "actual_tier": "small",
+      "repeat": true,
+      "cache_hit": true,
+      "cost_usd": 0.0,
+      "latency_ms": 1.358
+    },
+    {
+      "prompt": "Debug this architecture",
+      "expected_tier": "large",
+      "actual_tier": "large",
+      "repeat": true,
+      "cache_hit": true,
+      "cost_usd": 0.0,
+      "latency_ms": 1.209
+    },
+    {
+      "prompt": "Compare retrieval tradeoffs",
+      "expected_tier": "large",
+      "actual_tier": "large",
+      "repeat": true,
+      "cache_hit": true,
+      "cost_usd": 0.0,
+      "latency_ms": 1.419
+    },
+    {
+      "prompt": "Prove the following theorem",
+      "expected_tier": "large",
+      "actual_tier": "large",
+      "repeat": true,
+      "cache_hit": true,
+      "cost_usd": 0.0,
+      "latency_ms": 1.039
+    }
+  ]
+}
