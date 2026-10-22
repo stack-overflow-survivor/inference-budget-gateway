@@ -1,0 +1,9 @@
+[project]
+name = "inference-budget-gateway"
+version = "0.1.0"
+requires-python = ">=3.11"
+description = "Runnable applied AI engineering portfolio project"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
